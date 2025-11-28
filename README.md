@@ -7,7 +7,7 @@ A brutalist productivity suite for students who want their tools to work, not di
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 ![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)
 
-**🔗 Live Demo:** [studium.vercel.app](https://studium.vercel.app)
+**🔗 Live Demo:** [studium-suite.vercel.app](https://studium-suite.vercel.app)
 
 ## Overview
 
