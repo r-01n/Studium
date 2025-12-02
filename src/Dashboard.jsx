@@ -222,7 +222,7 @@ const getCategoryStyle = (category, source) => {
             scrollbarWidth: 'thin',
           }}
         >
-          <div className="relative px-4 py-4" style={{ height: '100%' }}>
+          <div className="relative px-4 py-4" style={{ height: '2400px' }}>
 
             {/* Hour markers */}
             {hours.map((hour) => {
