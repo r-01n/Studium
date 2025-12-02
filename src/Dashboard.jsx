@@ -111,8 +111,8 @@ const getCategoryStyle = (category, source) => {
   const getTimePosition = (timeStr) => {
     const [hours, minutes] = timeStr.split(':').map(Number);
     const totalMinutes = hours * 60 + minutes;
-    const startMinutes = 6 * 60; // 6 AM
-    const endMinutes = 22 * 60; // 10 PM
+    const startMinutes = 0 * 60; // 12 AM (midnight)
+    const endMinutes = 24 * 60; // 12 AM next day (midnight)
     const relativeMinutes = totalMinutes - startMinutes;
     const totalRange = endMinutes - startMinutes;
     return (relativeMinutes / totalRange) * 100;
@@ -179,7 +179,8 @@ const getCategoryStyle = (category, source) => {
   const currentTimePos = getCurrentTimePosition();
 
   // Generate hour markers
-  const hours = Array.from({ length: 17 }, (_, i) => i + 6); // 6 AM to 10 PM
+  const hours = Array.from({ length: 24 }, (_, i) => i); // 12 AM to 11 PM (full day)
+
 
   if (todaysItems.length === 0) {
     return (
