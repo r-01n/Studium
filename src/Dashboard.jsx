@@ -211,7 +211,7 @@ const getCategoryStyle = (category, source) => {
         </button>
       </div>
       
-      <div className="relative overflow-hidden" style={{ height: '600px' }}>
+      <div className="relative overflow-hidden" style={{ height: '300px' }}>
 
         {/* Scrollable timeline container */}
         <div 
@@ -662,6 +662,7 @@ const Dashboard = ({ setCurrentModule: setCurrentModuleProp }) => {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
             {/* Calendar */}
             <div className="lg:col-span-2">
               <div className="bg-white border-2 border-neutral-900 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
@@ -751,13 +752,11 @@ const Dashboard = ({ setCurrentModule: setCurrentModuleProp }) => {
                   </div>
                 </div>
               </div>
-            </div>
-
-            {/* Right Column */}
-            <div className="lg:col-span-1 space-y-6">
-              {/* Upcoming Items */}
-              <div className="bg-white border-2 border-neutral-900 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-                <div className="border-b-2 border-neutral-900 p-4">
+              {/* Upcoming and Quick Tasks Row */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6">
+                {/* Upcoming Items */}
+                <div className="bg-white border-2 border-neutral-900 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+<div className="border-b-2 border-neutral-900 p-4">
                   <h3 className="text-lg font-serif text-neutral-900">Upcoming</h3>
                 </div>
                 <div className="p-4 max-h-96 overflow-y-auto">
@@ -804,12 +803,11 @@ const Dashboard = ({ setCurrentModule: setCurrentModuleProp }) => {
                       })}
                     </div>
                   )}
-                </div>
-              </div>
+                </div>                </div>
 
-              {/* Quick Tasks */}
-              <div className="bg-white border-2 border-neutral-900 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-                <div className="border-b-2 border-neutral-900 p-4">
+                {/* Quick Tasks */}
+                <div className="bg-white border-2 border-neutral-900 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+                  <div className="border-b-2 border-neutral-900 p-4">
                   <h3 className="text-lg font-serif text-neutral-900">Quick Tasks</h3>
                 </div>
                 <div className="p-4">
@@ -864,8 +862,11 @@ const Dashboard = ({ setCurrentModule: setCurrentModuleProp }) => {
                     )}
                   </div>
                 </div>
+                </div>
               </div>
+            </div>
 
+            {/* Right Column */}
                 {/* Today's Timeline */}
                 <TodayTimeline 
                   events={timetableEvents} 
@@ -876,7 +877,6 @@ const Dashboard = ({ setCurrentModule: setCurrentModuleProp }) => {
           </div>
         </div>
       </div>
-    </div>
   );
 };
 
