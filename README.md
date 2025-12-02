@@ -1,70 +1,124 @@
-# Getting Started with Create React App
+# Studium
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A brutalist productivity suite for students who want their tools to work, not distract.
 
-## Available Scripts
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)
 
-In the project directory, you can run:
+**🔗 Live Demo:** [studium-suite.vercel.app](https://studium-suite.vercel.app)
 
-### `npm start`
+## Overview
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Studium is an all-in-one productivity platform built for students tired of juggling multiple apps with ads, bloat, and unnecessary features. Born from frustration with fragmented tools that track your data and distract from actual work, Studium bundles everything a student needs into one minimal, local-first application.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+**No ads. No tracking. No subscriptions. Just tools that work.**
 
-### `npm test`
+In use for 2+ months as a daily driver for managing studies, workouts, finances, and habits.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Philosophy
 
-### `npm run build`
+A tool should do its job well and get out of your way. Studium follows brutalist design principles: function over form, clarity over decoration. It might look soulless to some, but that's the point: the tool isn't the focus, your work is.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Features
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### 📊 Dashboard
+Your home base with quick actions, a full calendar view for events, daily statistics at a glance, and an upcoming tasks overview to keep you on track.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### 🍅 Pomodoro Planner
+A smart focus timer that goes beyond basic pomodoro. Tell it how long you want to work and your preferred split ratio—it auto-calculates your sessions and lets you plan what you'll tackle in each block. Perfect for marathon study sessions without burnout.
 
-### `npm run eject`
+### 💪 Workout Tracker
+Track your personal records (PRs), highest reps, and longest times. Built-in timer for tracking sets and rest periods. Progress visualization coming soon via the statistics module.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### ✅ Habits
+Daily habit tracking with checkboxes for binary habits and input fields for measurable ones (sleep hours, weight, water intake). Designed to integrate with a fully modular statistics dashboard currently in development.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### 📅 Timetable
+Weekly and daily schedule viewer for classes, workouts, planned downtime—anything recurring in your week.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### 📝 Schedule
+Event, assignment, and exam management for students who forget everything. Built for those who don't want to sync Google Calendar with their personal life (no data leakage to advertisers). Shows upcoming items automatically in the dashboard.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### 💰 Finance Tracker
+Budget tracking designed for newly independent students. Monitor subscriptions, food spending, and other expenses with category splitting and income tracking. Future budget suggestions planned.
 
-## Learn More
+### 📈 Statistics (In Development)
+Modular, user-customizable analytics dashboard. Currently functional but undergoing redesign for better data visualization across all modules.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Tech Stack
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Frontend
+- **React 18** with functional components and hooks
+- **Tailwind CSS** for utility-first styling
+- Custom CSS keyframe animations (fade-in, slide-up, scale-in)
 
-### Code Splitting
+### State & Storage
+- **localStorage** for client-side persistence
+- No backend required (easily portable if needed)
+- Data stays on your machine
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### Deployment & Analytics
+- **Vercel** for hosting
+- **Vercel Analytics** for anonymous usage metrics
 
-### Analyzing the Bundle Size
+### Architecture
+- **Modular component design** - each module is independently maintained
+- **Centralized routing** via App.js with persistent module state
+- **Synced data** across modules where relevant
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## Installation
 
-### Making a Progressive Web App
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/studium.git
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+# Install dependencies
+npm install
 
-### Advanced Configuration
+# Run development server
+npm start
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+# Build for production
+npm run build
+```
 
-### Deployment
+## Roadmap
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+### Current Focus
+- [ ] Complete statistics module redesign
+- [ ] Desktop Pet companion (design in progress)
+- [ ] Sound notifications for workout timer
+- [ ] Assignment/exam notifications (30min, 1h, 1 day, 1 week before)
+- [ ] User-suggested budgeting recommendations
+- [ ] Deeper module syncing and data integration
 
-### `npm run build` fails to minify
+### Future Considerations
+- [ ] Offline desktop version (Electron?)
+- [ ] Mobile native app (?)
+- [ ] Backend...?
+- [ ] Advanced performance optimizations
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## Why I Built This
+
+I started by building separate tools—a pomodoro timer, workout tracker, and finance tracker—because existing apps were either bloated with features I never used, riddled with ads, or designed to extract and monetize my data. 
+
+Then it hit me: why not bundle everything together? Students already have enough cognitive load without juggling five different apps. Studium is the unified, minimal, privacy-respecting tool I wish existed when I started.
+
+After 2 months of daily use, it's proven its worth. The pomodoro planner especially has transformed how I work. I can grind for hours without burning out because I know exactly what I'm doing in each block, and the pre-planned breaks work well to keep me from being tired.
+
+## Design Philosophy
+
+Studium embraces brutalism: no unnecessary decoration, no gamification gimmicks, no algorithmic engagement tricks. Just clean interfaces that help you get things done.
+
+Work and creation should be the focus.
+
+## Data Privacy
+
+Everything stays local. No server uploads, no third-party tracking, no data mining. Vercel Analytics provides anonymous aggregate metrics, but your actual productivity data never leaves your browser.
+
+## Contributing
+
+This is a personal project, but suggestions and feedback are welcome. Open an issue if you find bugs or have ideas for improvement.
+
