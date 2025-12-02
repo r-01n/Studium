@@ -1,5 +1,310 @@
 import React, { useState, useEffect } from 'react';
-import { Clock, Dumbbell, Target, Calendar, TrendingUp, CheckSquare, FileText, CalendarDays, ChevronLeft, ChevronRight, DollarSign, BarChart3, X, Plus, CheckCircle2, Circle } from 'lucide-react';
+import { Clock, Dumbbell, Target, Calendar, TrendingUp, CheckSquare, FileText, CalendarDays, ChevronLeft, ChevronRight, DollarSign, BarChart3, X, Plus, CheckCircle2, Circle, MapPin } from 'lucide-react';
+
+const TodayTimeline = ({ events, scheduleEvents, setCurrentModule }) => {
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const timelineRef = React.useRef(null);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 60000); // Update every minute
+
+    return () => clearInterval(timer);
+  }, []);
+
+  // Filter events for today and expand recurring events
+const getTodaysItems = () => {
+  const today = new Date();
+  const todayDay = today.getDay();
+  const todayStr = today.toISOString().split('T')[0];
+
+  // Get timetable events for today
+  const timetableItems = events
+    .filter(event => {
+      if (event.repeatDays && event.repeatDays.length > 0) {
+        return event.repeatDays.includes(todayDay);
+      }
+      return event.day === todayDay;
+    })
+    .map(event => ({
+      ...event,
+      id: `timetable-${event.id}-${todayStr}`,
+      source: 'timetable',
+      startTime: event.startTime,
+      endTime: event.endTime
+    }));
+
+  // Get schedule items for today (assignments, exams, events)
+  const scheduleItems = (scheduleEvents || [])
+    .filter(item => item.date === todayStr && item.time)
+    .map(item => {
+      // Calculate end time (assume 1 hour duration if not specified)
+      const [hours, minutes] = item.time.split(':').map(Number);
+      const endHour = hours + 1;
+      const endTime = `${String(endHour).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+      
+      return {
+        ...item,
+        id: `schedule-${item.id}`,
+        source: 'schedule',
+        startTime: item.time,
+        endTime: endTime,
+        title: item.title,
+        location: item.location || '',
+        category: item.type // assignment, exam, or event
+      };
+    });
+
+  // Combine and sort by start time
+  return [...timetableItems, ...scheduleItems].sort((a, b) => 
+    a.startTime.localeCompare(b.startTime)
+  );
+};
+
+const todaysItems = getTodaysItems();
+
+const getCategoryStyle = (category, source) => {
+  // Schedule items (assignments, exams, events)
+  if (source === 'schedule') {
+    const scheduleStyles = {
+      assignment: 'bg-red-100 border-red-600',
+      exam: 'bg-orange-100 border-orange-600',
+      event: 'bg-blue-100 border-blue-600'
+    };
+    return scheduleStyles[category] || 'bg-gray-100 border-gray-600';
+  }
+  
+  // Timetable items
+  const styles = {
+    class: 'bg-blue-100 border-blue-600',
+    work: 'bg-purple-100 border-purple-600',
+    exercise: 'bg-red-100 border-red-600',
+    personal: 'bg-green-100 border-green-600',
+    other: 'bg-yellow-100 border-yellow-600'
+  };
+  return styles[category] || styles.other;
+};
+
+  const formatTime = (time) => {
+    if (!time) return '';
+    const [hours, mins] = time.split(':').map(Number);
+    const period = hours >= 12 ? 'PM' : 'AM';
+    const displayHours = hours % 12 || 12;
+    return `${displayHours}:${String(mins).padStart(2, '0')} ${period}`;
+  };
+
+  const getTimePosition = (timeStr) => {
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    const totalMinutes = hours * 60 + minutes;
+    const startMinutes = 6 * 60; // 6 AM
+    const endMinutes = 22 * 60; // 10 PM
+    const relativeMinutes = totalMinutes - startMinutes;
+    const totalRange = endMinutes - startMinutes;
+    return (relativeMinutes / totalRange) * 100;
+  };
+
+  const getCurrentTimePosition = () => {
+    const hours = currentTime.getHours();
+    const minutes = currentTime.getMinutes();
+    const timeStr = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+    return getTimePosition(timeStr);
+  };
+
+  const getEventHeight = (startTime, endTime) => {
+    const startPos = getTimePosition(startTime);
+    const endPos = getTimePosition(endTime);
+    return endPos - startPos;
+  };
+
+  const isEventCurrent = (item) => {
+    const now = currentTime;
+    const currentTimeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    return item.startTime <= currentTimeStr && item.endTime > currentTimeStr;
+  };
+
+  const isEventPast = (item) => {
+    const now = currentTime;
+    const currentTimeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    return item.endTime <= currentTimeStr;
+  };
+
+  // Check for overlapping events
+  const getOverlappingGroups = () => {
+    const groups = [];
+    const processed = new Set();
+
+    todaysItems.forEach((item, idx) => {
+      if (processed.has(idx)) return;
+
+      const group = [item];
+      processed.add(idx);
+
+      // Find all events that overlap with this one
+      for (let i = idx + 1; i < todaysItems.length; i++) {
+        if (processed.has(i)) continue;
+        
+        const other = todaysItems[i];
+        const hasOverlap = group.some(e => 
+          (other.startTime < e.endTime && other.endTime > e.startTime)
+        );
+
+        if (hasOverlap) {
+          group.push(other);
+          processed.add(i);
+        }
+      }
+
+      groups.push(group);
+    });
+
+    return groups;
+  };
+
+  const overlappingGroups = getOverlappingGroups();
+  const currentTimePos = getCurrentTimePosition();
+
+  // Generate hour markers
+  const hours = Array.from({ length: 17 }, (_, i) => i + 6); // 6 AM to 10 PM
+
+  if (todaysItems.length === 0) {
+    return (
+      <div className="bg-white border-2 border-neutral-900 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+        <div className="border-b-2 border-neutral-900 p-4">
+          <h3 className="text-lg font-serif text-neutral-900">Today's Schedule</h3>
+        </div>
+        <div className="p-8 text-center">
+          <Clock className="w-12 h-12 mx-auto mb-3 text-neutral-400 border-4 border-neutral-900 p-2" />
+          <p className="text-sm text-neutral-600 font-mono">No events scheduled today</p>
+          <button
+            onClick={() => setCurrentModule( 'timetable' ? 'timetable' : 'schedule')}            className="mt-4 px-4 py-2 text-xs border-2 border-neutral-900 bg-white text-neutral-900 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all font-mono font-bold uppercase"
+          >
+            Add Events
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white border-2 border-neutral-900 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+      <div className="border-b-2 border-neutral-900 p-4 flex items-center justify-between">
+        <h3 className="text-lg font-serif text-neutral-900">Today's Schedule</h3>
+        <button
+          onClick={() => setCurrentModule( 'timetable' ? 'timetable' : 'schedule')}          className="text-xs px-3 py-1 border-2 border-neutral-900 hover:bg-neutral-900 hover:text-white transition-colors font-mono font-bold uppercase"
+        >
+          View All
+        </button>
+      </div>
+      
+      <div className="relative h-96 overflow-hidden">
+        {/* Scrollable timeline container */}
+        <div 
+          ref={timelineRef}
+          className="absolute inset-0 overflow-y-auto"
+          style={{
+            scrollbarWidth: 'thin',
+          }}
+        >
+          <div className="relative h-[800px] px-4 py-4">
+            {/* Hour markers */}
+            {hours.map((hour) => {
+              const position = getTimePosition(`${hour}:00`);
+              return (
+                <div
+                  key={hour}
+                  className="absolute left-0 right-0 flex items-center"
+                  style={{ top: `${position}%` }}
+                >
+                  <div className="w-12 text-xs font-mono font-bold text-neutral-600">
+                    {hour === 0 ? '12 AM' : hour < 12 ? `${hour} AM` : hour === 12 ? '12 PM' : `${hour - 12} PM`}
+                  </div>
+                  <div className="flex-1 h-px bg-neutral-300"></div>
+                </div>
+              );
+            })}
+
+            {/* Event blocks */}
+            <div className="absolute left-12 right-4 top-0 bottom-0">
+              {overlappingGroups.map((group, groupIdx) => {
+                const groupWidth = 100 / Math.max(group.length, 1);
+                
+                return group.map((event, eventIdx) => {
+                  const topPos = getTimePosition(event.startTime);
+                  const height = getEventHeight(event.startTime, event.endTime);
+                  const isCurrent = isEventCurrent(event);
+                  const isPast = isEventPast(event);
+                  const leftOffset = eventIdx * groupWidth;
+                  const zIndex = group.length - eventIdx; // Last event on top
+
+                  return (
+                    <div
+                      key={event.id}
+                      className={`absolute border-2 border-neutral-900 p-2 cursor-pointer transition-all ${getCategoryStyle(event.category, event.source)} ${
+                        isCurrent ? 'ring-4 ring-neutral-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]' : 
+                        isPast ? 'opacity-50' : 
+                        'hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5'
+                      }`}
+                      style={{
+                        top: `${topPos}%`,
+                        height: `${Math.max(height, 8)}%`,
+                        left: `${leftOffset}%`,
+                        width: `${groupWidth}%`,
+                        zIndex: zIndex
+                      }}
+                      onClick={() => setCurrentModule( 'timetable' ? 'timetable' : 'schedule')}                    >
+                      <div className="flex items-start gap-1 mb-1">
+                        {event.source === 'schedule' && (
+                          <span className="text-xs">
+                            {event.category === 'assignment' ? '📝' : event.category === 'exam' ? '📚' : '📅'}
+                          </span>
+                        )}
+                        <div className="text-xs font-bold font-mono uppercase text-neutral-900 truncate flex-1">
+                          {event.title}
+                        </div>
+                      </div>
+                      <div className="text-xs font-mono text-neutral-700 mt-1">
+                        {formatTime(event.startTime)}
+                      </div>
+                      {event.location && (
+                        <div className="text-xs font-mono text-neutral-600 truncate flex items-center gap-1 mt-1">
+                          <MapPin className="w-3 h-3" />
+                          {event.location}
+                        </div>
+                      )}
+                      {isCurrent && (
+                        <div className="absolute top-1 right-1">
+                          <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                });
+              })}
+            </div>
+
+            {/* Current time indicator - NOW line */}
+            <div
+              className="absolute left-0 right-0 z-20 pointer-events-none"
+              style={{ top: `${currentTimePos}%` }}
+            >
+              <div className="flex items-center">
+                <div className="w-12 flex items-center justify-center">
+                  <div className="w-3 h-3 bg-red-500 rounded-full border-2 border-neutral-900"></div>
+                </div>
+                <div className="flex-1 h-1 bg-red-500 border-y-2 border-neutral-900 relative">
+                  <div className="absolute right-0 top-1/2 -translate-y-1/2 bg-red-500 border-2 border-neutral-900 px-2 py-0.5">
+                    <span className="text-xs font-mono font-bold text-white">NOW</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const Dashboard = ({ setCurrentModule: setCurrentModuleProp }) => {
   const [internalModule, setInternalModule] = useState('dashboard');
@@ -15,6 +320,7 @@ const Dashboard = ({ setCurrentModule: setCurrentModuleProp }) => {
   const [eventsExams, setEventsExams] = useState([]);
   const [quickTasks, setQuickTasks] = useState([]);
   const [newTaskText, setNewTaskText] = useState('');
+  const [timetableEvents, setTimetableEvents] = useState([]);
   
   const [modalContent, setModalContent] = useState(null);
 
@@ -53,6 +359,9 @@ const Dashboard = ({ setCurrentModule: setCurrentModuleProp }) => {
     setAssignments(savedAssignments);
     setEventsExams(savedEvents);
     setQuickTasks(savedQuickTasks);
+
+    const savedTimetableEvents = JSON.parse(localStorage.getItem('timetableEvents') || '[]');
+    setTimetableEvents(savedTimetableEvents);
   }, []);
 
   useEffect(() => {
@@ -542,17 +851,12 @@ const Dashboard = ({ setCurrentModule: setCurrentModuleProp }) => {
                 </div>
               </div>
 
-              {/* Quick Actions */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3">
-                <button onClick={() => setCurrentModule('pomodoro')} className="w-full bg-neutral-900 text-white p-4 text-left border-2 border-neutral-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all group">
-                  <Clock className="w-5 h-5 mb-2" />
-                  <div className="text-sm font-medium font-mono uppercase tracking-wide">Start Focus</div>
-                </button>
-                <button onClick={() => setCurrentModule('habits')} className="w-full bg-white border-2 border-neutral-900 p-4 text-left shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all group">
-                  <CheckSquare className="w-5 h-5 mb-2 text-neutral-900" />
-                  <div className="text-sm font-medium text-neutral-900 font-mono uppercase tracking-wide">Check Habits</div>
-                </button>
-              </div>
+                {/* Today's Timeline */}
+                <TodayTimeline 
+                  events={timetableEvents} 
+                  scheduleEvents={[...assignments, ...eventsExams]} 
+                  setCurrentModule={setCurrentModule} 
+                />
             </div>
           </div>
         </div>
