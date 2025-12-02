@@ -212,7 +212,7 @@ const getCategoryStyle = (category, source) => {
         </button>
       </div>
       
-      <div className="relative overflow-hidden" style={{ height: '300px' }}>
+      <div className="relative overflow-hidden" style={{ height: '100%' }}>
 
         {/* Scrollable timeline container */}
         <div 
@@ -222,7 +222,8 @@ const getCategoryStyle = (category, source) => {
             scrollbarWidth: 'thin',
           }}
         >
-          <div className="relative h-[800px] px-4 py-4">
+          <div className="relative px-4 py-4" style={{ height: '100%' }}>
+
             {/* Hour markers */}
             {hours.map((hour) => {
               const position = getTimePosition(`${hour}:00`);
