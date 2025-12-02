@@ -13,6 +13,20 @@ const TodayTimeline = ({ events, scheduleEvents, setCurrentModule }) => {
     return () => clearInterval(timer);
   }, []);
 
+  // Auto-scroll to keep NOW line in the middle
+  useEffect(() => {
+    if (timelineRef.current) {
+      const container = timelineRef.current;
+      const containerHeight = container.clientHeight;
+      const contentHeight = container.scrollHeight;
+      const currentTimePos = getCurrentTimePosition();
+      
+      // Calculate scroll position to center the NOW line
+      const targetScroll = (contentHeight * currentTimePos / 100) - (containerHeight / 2);
+      container.scrollTop = Math.max(0, targetScroll);
+    }
+  }, [currentTime]);
+
   // Filter events for today and expand recurring events
 const getTodaysItems = () => {
   const today = new Date();
@@ -197,7 +211,8 @@ const getCategoryStyle = (category, source) => {
         </button>
       </div>
       
-      <div className="relative h-96 overflow-hidden">
+      <div className="relative overflow-hidden" style={{ height: '600px' }}>
+
         {/* Scrollable timeline container */}
         <div 
           ref={timelineRef}
